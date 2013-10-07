@@ -4,6 +4,7 @@
  */
 package xylifyx.format.pwg;
 
+import xylifyx.format.ImageStream;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class PwgTest {
         InputStream in = testImageFile.openStream();
         DataInputStream din = new DataInputStream(new BufferedInputStream(in));
 
-        PwgFile.loadFromStream(testImageFile.toExternalForm(), din, new RasterDataOutput() {
+        PwgFileReader.loadFromStream(testImageFile.toExternalForm(), din, new ImageStream() {
 
             public void rasterLine(int y, byte[] rasterLine) {
              }

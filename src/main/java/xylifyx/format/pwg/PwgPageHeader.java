@@ -1,5 +1,6 @@
 package xylifyx.format.pwg;
 
+import xylifyx.format.ImageStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -20,9 +21,9 @@ import xylifyx.format.DataReader;
  * </ul>
  * All other fields MUST be initialized to 0.
  */
-public class PwgPageHeader implements DataReader<DataInputStream, RasterDataOutput> {
+public class PwgPageHeader implements DataReader<DataInputStream, ImageStream> {
 
-    public void load(DataInputStream input, RasterDataOutput output) throws IOException {
+    public void load(DataInputStream input, ImageStream output) throws IOException {
         int pos;
 
         pos = 0;
@@ -45,7 +46,7 @@ public class PwgPageHeader implements DataReader<DataInputStream, RasterDataOutp
         pos += 20;
         pos += readZeros(1796 - pos, input);
 
-        for (RasterFormat rf : RasterFormat.values()) {
+        for (PwgRasterFormat rf : PwgRasterFormat.values()) {
             if (rf.matches(cupsBitsPerColor, cupsBitsPerPixel, cupsColorOrder, cupsColorSpace)) {
                 pwgRasterFormat = rf;
                 break;
@@ -56,7 +57,7 @@ public class PwgPageHeader implements DataReader<DataInputStream, RasterDataOutp
                     Level.WARNING, "RasterFormat not valid PWG: cupsBitsPerColor={0}, cupsBitsPerPixel={1}, cupsColorOrder={2}, cupsColorSpace={3}", new Object[]{cupsBitsPerColor, cupsBitsPerPixel, cupsColorOrder, cupsColorSpace});
         }
     }
-    public RasterFormat pwgRasterFormat;
+    public PwgRasterFormat pwgRasterFormat;
 
     /**
      * 276-283	Unsigned Integers (2)	HWResolution	Horizontal and vertical

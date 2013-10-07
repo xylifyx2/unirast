@@ -4,18 +4,19 @@
  */
 package xylifyx.format.pwg;
 
+import xylifyx.format.ImageStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import xylifyx.format.DataReader;
-import xylifyx.format.InvalidFileFormat;
+import xylifyx.format.DebugImageStream;
 
 /**
  *
  * @author emartino
  */
-public class Chunk3Decode implements DataReader<DataInputStream, RasterDataOutput> {
+public class Chunk3Decode implements DataReader<DataInputStream, ImageStream> {
 
     public static final int CHUNK_SIZE = 3;
     final int pixelHeight, pixelWidth;
@@ -40,7 +41,7 @@ public class Chunk3Decode implements DataReader<DataInputStream, RasterDataOutpu
      * @throws IOException
      */
     @Override
-    public void load(DataInputStream in, RasterDataOutput out) throws IOException {
+    public void load(DataInputStream in, ImageStream out) throws IOException {
         byte[] chunk = new byte[CHUNK_SIZE];
         byte[] rasterLine = new byte[bytesPerLine];
         for (int y = 0; y < pixelHeight;) {
@@ -69,8 +70,7 @@ public class Chunk3Decode implements DataReader<DataInputStream, RasterDataOutpu
         }
     }
     static byte[] testData = new byte[]{
-        (byte) 0x00,
-        (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+        (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
         (byte) 0x02, (byte) 0xFF, (byte) 0xFF, (byte) 0x00, (byte) 0x03,
         (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0x00, (byte) 0xFE,
         (byte) 0xFF, (byte) 0xFF, (byte) 0x00, (byte) 0x00, (byte) 0x00,
@@ -96,39 +96,7 @@ public class Chunk3Decode implements DataReader<DataInputStream, RasterDataOutpu
 
         Chunk3Decode c3d = new Chunk3Decode(8, 8, bpp);
 
-        c3d.load(new DataInputStream(new ByteArrayInputStream(testData)), new RasterDataOutput() {
-            public void rasterLine(int y, byte[] rasterLine) {
-                System.out.print(y + ": ");
-                for (int i = 0; i < 24; i += 3) {
-                    System.out.print(toHex(rasterLine[i]));
-                    System.out.print(toHex(rasterLine[i + 1]));
-                    System.out.print(toHex(rasterLine[i + 2]));
-
-                    System.out.print(" ");
-                }
-                System.out.println();
-            }
-
-            public void invalidFileFormat(InvalidFileFormat e) throws InvalidFileFormat {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            public void ioException(IOException e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            public void beginPage(PwgPageHeader page) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            public void endPage(PwgPageHeader page) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            public void beginPwg(String uri) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
+        c3d.load(new DataInputStream(new ByteArrayInputStream(testData)), new DebugImageStream());
 
 
     }

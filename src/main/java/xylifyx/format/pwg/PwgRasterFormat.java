@@ -20,7 +20,7 @@ package xylifyx.format.pwg;
  * <li>device-2-8	[PWG5102.RAS]</li>
  * </ul>
  */
-public enum RasterFormat {
+public enum PwgRasterFormat {
 
     black_1(1, 1, ColorSpace.black),
     sgray_1(1, 1, ColorSpace.sGray),
@@ -37,7 +37,7 @@ public enum RasterFormat {
     private final int bitsPerPixel;
     private final ColorSpace colorSpace;
 
-    private RasterFormat(int bitsPerColor, int bitsPerPixel, ColorSpace colorSpace) {
+    private PwgRasterFormat(int bitsPerColor, int bitsPerPixel, ColorSpace colorSpace) {
         this.bitsPerColor = bitsPerColor;
         this.bitsPerPixel = bitsPerPixel;
         this.colorSpace = colorSpace;

@@ -4,6 +4,7 @@
  */
 package xylifyx.format.pwg;
 
+import xylifyx.format.ImageStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import xylifyx.format.InvalidFileFormat;
  *
  * @author emartino
  */
-public class PwgFile implements DataReader<DataInputStream, RasterDataOutput> {
+public class PwgFileReader implements DataReader<DataInputStream, ImageStream> {
 // #  define CUPS_RASTER_SYNCv2	0x52615332	/* RaS2 */
 // #  define CUPS_RASTER_SYNC_PWG	CUPS_RASTER_SYNCv2
 
@@ -29,17 +30,17 @@ public class PwgFile implements DataReader<DataInputStream, RasterDataOutput> {
     public final static String RaS2 = "RaS2";
 
     public static void loadFromStream(String uri,
-            DataInputStream input, RasterDataOutput output) throws IOException {
-        PwgFile pwg = new PwgFile(uri);
+            DataInputStream input, ImageStream output) throws IOException {
+        PwgFileReader pwg = new PwgFileReader(uri);
         pwg.load(input, output);
     }
     private final String uri;
 
-    private PwgFile(String uri) {
+    private PwgFileReader(String uri) {
         this.uri = uri;
     }
 
-    public void load(DataInputStream input, RasterDataOutput output) {
+    public void load(DataInputStream input, ImageStream output) {
 
         try {
             // PWG Magic 
@@ -56,7 +57,6 @@ public class PwgFile implements DataReader<DataInputStream, RasterDataOutput> {
                 try {
                     page.load(input, output);
                 } catch (EOFException e) {
-                    Debug.endOfFile(e);
                     break;
                 }
                 output.beginPage(page);
