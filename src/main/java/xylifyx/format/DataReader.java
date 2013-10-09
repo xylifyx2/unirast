@@ -12,5 +12,5 @@ import java.io.IOException;
  * @author emartino
  */
 public interface DataReader<I,O> {
-    public void load(I input, O output) throws IOException;
+    public void readInput(I input, O output) throws IOException;
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import xylifyx.format.DataReader;
 import xylifyx.format.DebugImageStream;
+import xylifyx.format.Raster;
 
 /**
  *
@@ -28,6 +29,24 @@ public class Chunk3Decode implements DataReader<DataInputStream, ImageStream> {
         this.bytesPerLine = bytesPerLine;
     }
 
+    private class RasterLine implements Raster {
+
+        byte[] rasterLine;
+        int y;
+
+        public int getY() {
+            return y;
+        }
+
+        public byte[] getRasterData() {
+            return rasterLine;
+        }
+
+        public int getWidth() {
+            return pixelWidth;
+        }
+    }
+
     /**
      * whole color values for that line are run-length encoded using a
      * PackBits-like run-length encoding algorithm: 1 to 128 repeated colors are
@@ -41,9 +60,13 @@ public class Chunk3Decode implements DataReader<DataInputStream, ImageStream> {
      * @throws IOException
      */
     @Override
-    public void load(DataInputStream in, ImageStream out) throws IOException {
-        byte[] chunk = new byte[CHUNK_SIZE];
-        byte[] rasterLine = new byte[bytesPerLine];
+    public void readInput(DataInputStream in, ImageStream out) throws IOException {
+        final byte[] chunk = new byte[CHUNK_SIZE];
+        final byte[] rasterLine = new byte[bytesPerLine];
+
+        RasterLine raster = new RasterLine();
+        raster.rasterLine = rasterLine;
+
         for (int y = 0; y < pixelHeight;) {
             int lineRepetition = 1 + (0xFF & (int) in.readByte()); // Unsigned Byte?
             for (int x = 0; x < pixelWidth;) {
@@ -63,7 +86,9 @@ public class Chunk3Decode implements DataReader<DataInputStream, ImageStream> {
                 }
             }
             for (int c = 0; c < lineRepetition; c++) {
-                out.rasterLine(y, rasterLine);
+                raster.y = y;
+                raster.rasterLine = rasterLine;
+                out.rasterLine(raster);
                 y++;
             }
             Arrays.fill(rasterLine, (byte) 0);
@@ -96,7 +121,7 @@ public class Chunk3Decode implements DataReader<DataInputStream, ImageStream> {
 
         Chunk3Decode c3d = new Chunk3Decode(8, 8, bpp);
 
-        c3d.load(new DataInputStream(new ByteArrayInputStream(testData)), new DebugImageStream());
+        c3d.readInput(new DataInputStream(new ByteArrayInputStream(testData)), new DebugImageStream());
 
 
     }

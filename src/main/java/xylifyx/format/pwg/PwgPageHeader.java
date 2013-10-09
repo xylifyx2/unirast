@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import xylifyx.format.DataReader;
+import xylifyx.format.PageHeader;
 
 /**
  * All "image/cups" streams MUST initialize the
@@ -21,9 +22,9 @@ import xylifyx.format.DataReader;
  * </ul>
  * All other fields MUST be initialized to 0.
  */
-public class PwgPageHeader implements DataReader<DataInputStream, ImageStream> {
+public class PwgPageHeader implements PageHeader, DataReader<DataInputStream, ImageStream> {
 
-    public void load(DataInputStream input, ImageStream output) throws IOException {
+    public void readInput(DataInputStream input, ImageStream output) throws IOException {
         int pos;
 
         pos = 0;
@@ -58,7 +59,6 @@ public class PwgPageHeader implements DataReader<DataInputStream, ImageStream> {
         }
     }
     public PwgRasterFormat pwgRasterFormat;
-
     /**
      * 276-283	Unsigned Integers (2)	HWResolution	Horizontal and vertical
      * resolution in dots-per-inch.
@@ -170,5 +170,21 @@ public class PwgPageHeader implements DataReader<DataInputStream, ImageStream> {
             }
         }
         return zeroCount;
+    }
+
+    public byte getBytesPerPixel() {
+        return getBytesPerPixel();
+    }
+
+    public int getResolutionX() {
+        return hwResolutionHorizontal;
+    }
+
+    public int getHeight() {
+        return cupsHeight;
+    }
+
+    public int getWidth() {
+        return cupsWidth;
     }
 }

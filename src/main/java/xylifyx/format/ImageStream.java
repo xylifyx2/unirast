@@ -15,16 +15,17 @@ import xylifyx.format.pwg.PwgPageHeader;
  */
 public interface ImageStream {
 
-    public void rasterLine(int y, byte[] rasterLine);
+    public void rasterLine(Raster raster) throws IOException;
 
-    public void invalidFileFormat(InvalidFileFormat e);
+    public void invalidFileFormat(InvalidFileFormat e) throws IOException;
 
-    public void ioException(IOException e);
+    public void ioException(IOException e) throws IOException;
 
-    public void beginPage(PwgPageHeader page);
+    public void beginPage(PageHeader page) throws IOException;
 
-    public void endPage(PwgPageHeader page);
+    public void endPage(PageHeader page) throws IOException;
 
-    public void beginPwg(String uri);
-    
+    public void beginImageDocument(String uri) throws IOException;
+
+    public void endImageDocument(int pages) throws IOException;
 }

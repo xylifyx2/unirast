@@ -11,6 +11,9 @@ import java.io.IOException;
  *
  * @author emartino
  */
-public interface DataWriter {
-    public void save(DataOutputStream o) throws IOException;
+public interface DataWriter<Input, Output> {
+
+    public void writeImage(Input input, Output output) throws IOException;
+
+    public void flush(DataOutputStream output) throws IOException;
 }

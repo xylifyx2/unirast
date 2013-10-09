@@ -13,12 +13,13 @@ import xylifyx.format.pwg.PwgPageHeader;
  */
 public class DebugImageStream implements ImageStream {
 
-    public void rasterLine(int y, byte[] rasterLine) {
-        System.out.print(y + ": ");
+    public void rasterLine(Raster raster) {
+        System.out.print(raster.getY() + ": ");
+        byte[] r = raster.getRasterData();
         for (int i = 0; i < 24; i += 3) {
-            System.out.print(toHex(rasterLine[i]));
-            System.out.print(toHex(rasterLine[i + 1]));
-            System.out.print(toHex(rasterLine[i + 2]));
+            System.out.print(toHex(r[i]));
+            System.out.print(toHex(r[i + 1]));
+            System.out.print(toHex(r[i + 2]));
 
             System.out.print(" ");
         }
@@ -26,22 +27,31 @@ public class DebugImageStream implements ImageStream {
     }
 
     public void invalidFileFormat(InvalidFileFormat e) {
+        throw e;
     }
 
     public void ioException(IOException e) {
+        throw new InvalidFileFormat(e);
     }
 
-    public void beginPage(PwgPageHeader page) {
+    public void beginPage(PageHeader page) {
+        System.out.println(page);
     }
 
-    public void endPage(PwgPageHeader page) {
+    public void endPage(PageHeader page) {
+        System.out.println("page done");
     }
 
-    public void beginPwg(String uri) {
+    public void beginImageDocument(String uri) {
+        System.out.println("begin file " + uri);
     }
 
     public static String toHex(byte c) {
         int v = 0x100 + (0xFF & (int) c);
         return Integer.toHexString(v).substring(1);
+    }
+
+    public void endImageDocument(int pages) {
+        System.out.println("end file " + pages);
     }
 }

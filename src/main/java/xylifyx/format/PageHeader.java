@@ -9,5 +9,13 @@ package xylifyx.format;
  * @author emartino
  */
 public interface PageHeader {
+
+    public byte getBytesPerPixel();
+
+    public int getResolutionX();
+
+    public int getHeight();
+
+    public int getWidth();
     
 }

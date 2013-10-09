@@ -4,13 +4,20 @@
  */
 package xylifyx.format.pwg;
 
-import xylifyx.format.ImageStream;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import xylifyx.format.InvalidFileFormat;
+import xylifyx.format.DebugImageStream;
+import xylifyx.format.ImageStream;
+import xylifyx.format.Raster;
+import xylifyx.format.TeeImageStream;
+import xylifyx.format.unirast.UrfWriter;
 
 /**
  *
@@ -20,34 +27,23 @@ public class PwgTest {
 
     public static void main(String[] args) throws Exception {
         final URL testImageFile = PwgTest.class.getResource("test.pwg");
+
         InputStream in = testImageFile.openStream();
         DataInputStream din = new DataInputStream(new BufferedInputStream(in));
 
-        PwgFileReader.loadFromStream(testImageFile.toExternalForm(), din, new ImageStream() {
+        final File urfFile = new File(new File(System.getProperty("user.home", ".")), "test.urf");
+        OutputStream out = new FileOutputStream(urfFile);
+        DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(out));
 
-            public void rasterLine(int y, byte[] rasterLine) {
-             }
-
-            public void invalidFileFormat(InvalidFileFormat e) {
-                throw e;
+        final DebugImageStream loggingImageStream = new DebugImageStream() {
+            @Override
+            public void rasterLine(Raster raster) {
             }
+        };
+        ImageStream imageWriter = new UrfWriter(dout);
 
-            public void ioException(IOException e) {
-                throw new InvalidFileFormat(e);
-            }
+        TeeImageStream tee = new TeeImageStream(loggingImageStream, imageWriter);
 
-            public void beginPage(PwgPageHeader page) {
-                System.out.println(page);
-            }
-
-            public void endPage(PwgPageHeader page) {
-                System.out.println("page done");
-            }
-
-            public void beginPwg(String uri) {
-                 System.out.println("load file "+uri);
-            }
-        });
-
+        PwgFileReader.loadFromStream(testImageFile.toExternalForm(), din, tee);
     }
 }

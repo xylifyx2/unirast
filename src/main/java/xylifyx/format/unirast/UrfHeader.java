@@ -7,17 +7,28 @@ package xylifyx.format.unirast;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import xylifyx.format.DataWriter;
+import xylifyx.format.ImageStream;
+import xylifyx.format.pwg.PwgFileReader;
 
 /**
- *
- * @author emartino
+ * file header (12 bytes)
+ * <table>
+ * <tr>
+ * <td>554e 4952 4153 5400 <td> = "UNIRAST\0"
+ * </tr>
+ * <tr>
+ * <td>0000 0001 <td>= 1 page
+ * </tr>
  */
-public class UrfHeader implements DataWriter {
-    int pageCount;
+public class UrfHeader implements DataWriter<Integer, DataOutputStream> {
 
-    public void save(DataOutputStream o) throws IOException {
-        o.writeBytes(Urf.MAGIC);
-        o.writeInt(pageCount);
+    public static final String MAGIC = "UNIRAST\u0000";
+
+    public void writeImage(Integer pageCount, DataOutputStream output) throws IOException {
+        output.write(MAGIC.getBytes());
+        output.writeInt(pageCount);
     }
-    
+
+    public void flush(DataOutputStream output) {
+    }
 }

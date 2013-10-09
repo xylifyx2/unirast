@@ -8,10 +8,6 @@ import xylifyx.format.ImageStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import xylifyx.format.DataReader;
 import xylifyx.format.InvalidFileFormat;
 
@@ -32,7 +28,7 @@ public class PwgFileReader implements DataReader<DataInputStream, ImageStream> {
     public static void loadFromStream(String uri,
             DataInputStream input, ImageStream output) throws IOException {
         PwgFileReader pwg = new PwgFileReader(uri);
-        pwg.load(input, output);
+        pwg.readInput(input, output);
     }
     private final String uri;
 
@@ -40,8 +36,8 @@ public class PwgFileReader implements DataReader<DataInputStream, ImageStream> {
         this.uri = uri;
     }
 
-    public void load(DataInputStream input, ImageStream output) {
-
+    public void readInput(DataInputStream input, ImageStream output) throws IOException {
+        int pageCount = 0;
         try {
             // PWG Magic 
             byte[] header = new byte[RaS2.length()];
@@ -50,12 +46,12 @@ public class PwgFileReader implements DataReader<DataInputStream, ImageStream> {
             if (!RaS2.equals(new String(header))) {
                 throw new InvalidFileFormat();
             }
-            output.beginPwg(uri);
+            output.beginImageDocument(uri);
             // For each page
             for (;;) {
                 PwgPageHeader page = new PwgPageHeader();
                 try {
-                    page.load(input, output);
+                    page.readInput(input, output);
                 } catch (EOFException e) {
                     break;
                 }
@@ -66,15 +62,17 @@ public class PwgFileReader implements DataReader<DataInputStream, ImageStream> {
                 switch (page.pwgRasterFormat) {
                     case srgb_8: {
                         Chunk3Decode decoder = new Chunk3Decode(page.cupsWidth, page.cupsHeight, page.cupsBytesPerLine);
-                        decoder.load(input, output);
+                        decoder.readInput(input, output);
                     }
                     break;
                     default:
                         throw new InvalidFileFormat("Unsupported rasterFormat: " + page.pwgRasterFormat);
                 }
                 output.endPage(page);
+                pageCount++;
             }
-        } catch (InvalidFileFormat e) {
+            output.endImageDocument(pageCount);
+         } catch (InvalidFileFormat e) {
             output.invalidFileFormat(e);
         } catch (IOException e) {
             output.ioException(e);
